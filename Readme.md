@@ -4,7 +4,7 @@ This project provides a set of JavaScript tools for downloading and parsing rewa
 ## Usage
 To use this project, you can clone the repository and run the following command to download the reward history data:
 ```
-./dl.js
+./download.js
 ```
 
 This will download the current block from the Arweave network and save it to a local file called `dl.bin`.
