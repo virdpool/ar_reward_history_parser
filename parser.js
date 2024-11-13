@@ -7,8 +7,7 @@ const binaryData = fs.readFileSync(filePath);
 
 // Define the number of entities in the binary data
 // Iterate over the binary data buffer to extract each entity in the list
-const parsedData = [];
-const addrHash = {};
+let parsedData = [];
 let offset = 0;
 while(offset < binaryData.length) {
   const addrPosition = offset;
@@ -35,12 +34,6 @@ while(offset < binaryData.length) {
   // Parse the buffer as a bigint
   const rewardBigint = BigInt(`0x${buffer.toString('hex')}`);
   
-  
-  if (addrHash[addrBase64url] == null) 
-    addrHash[addrBase64url] = 0n;
-  addrHash[addrBase64url] += rewardBigint;
-  
-  
   // Create an object with the extracted fields
   const entity = {
     Addr: addrBase64url,
@@ -52,6 +45,19 @@ while(offset < binaryData.length) {
   };
 
   parsedData.push(entity);
+}
+
+// after 2.8 only part of history represents pending rewards
+const addrHash = {};
+const pendingHistoryLength = 21600;
+parsedData = parsedData.slice(parsedData.length - pendingHistoryLength)
+
+for(const entity of parsedData) {
+  const Addr  = entity.Addr;
+  const Reward= entity.Reward;
+  if (addrHash[Addr] == null)
+    addrHash[Addr] = 0n;
+  addrHash[Addr] += Reward;
 }
 
 const sortedArray = Object.entries(addrHash).sort((a, b) => +(b[1] - a[1]).toString());
